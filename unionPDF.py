@@ -8,7 +8,7 @@ from PyPDF2 import PdfWriter
 # функциональное программирование
 
 # байт64 в пдф
-def b64_to_pdf(b64):
+def _b64_to_pdf(b64):
 
     # Decode the Base64 string, making sure that it contains only valid characters
     byte_dec = b64decode(b64, validate=True)
@@ -30,7 +30,7 @@ def union_b64_to_pdf(file_name):
     # Создаем замыкание
 
     def merge_b64_to_pdf(b64, write_flag=False):
-        merger.append(b64_to_pdf(b64))
+        merger.append(_b64_to_pdf(b64))
         if write_flag:
             merger.write(file_name)
             merger.close()
@@ -46,8 +46,18 @@ class Unionb64toPDF():
         self.merger = PdfWriter()
         self.file_name = file_name
 
+    def _b64_to_pdf(self, b64):
+
+        # Decode the Base64 string, making sure that it contains only valid characters
+        byte_dec = b64decode(b64, validate=True)
+
+        if byte_dec[0:4] != b'%PDF':
+            raise ValueError('Missing the PDF file signature')
+        reader = PdfReader(BytesIO(byte_dec))
+        return reader
+
     def append(self, b64):
-        self.merger.append(b64_to_pdf(b64))
+        self.merger.append(self._b64_to_pdf(b64))
 
     def close(self):
         self.merger.write(self.file_name)
