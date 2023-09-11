@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.print_page_options import PrintOptions
 
-from unionPDF import unionb64toPDF
+from unionPDF import union_b64_to_pdf
 
 idProg = '63154'
 catalog = Path(Path.home(),'RabProg')
@@ -32,7 +32,7 @@ PO.background = False
 flagEnd = False
 namberPage = 1
 
-updf = unionb64toPDF(outFile)
+updf = union_b64_to_pdf(outFile)
 
 while not flagEnd:
     sleep(3)

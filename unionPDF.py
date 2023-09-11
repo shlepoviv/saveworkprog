@@ -1,24 +1,25 @@
 from io import BytesIO
 from pathlib import Path
+from base64 import b64decode
 from PyPDF2 import PdfReader
 from PyPDF2 import PdfWriter
-from base64 import b64decode
+
 
 # функциональное программирование
 
-#байт64 в пдф
-def b64toPdf(b64):
+# байт64 в пдф
+def b64_to_pdf(b64):
 
     # Decode the Base64 string, making sure that it contains only valid characters
-    b = b64decode(b64, validate=True)
+    byte_dec = b64decode(b64, validate=True)
 
-    if b[0:4] != b'%PDF':
-        raise ValueError('Missing the PDF file signature') 
-    reader = PdfReader(BytesIO(b))
+    if byte_dec[0:4] != b'%PDF':
+        raise ValueError('Missing the PDF file signature')
+    reader = PdfReader(BytesIO(byte_dec))
     return reader
-    
 
-def unionb64toPDF(fileName):
+
+def union_b64_to_pdf(file_name):
     """ 
     Возвращает метод mergeb64toPDF который объеденяет
     передаваемые станицы ПДФ в формате байт64 и записывает
@@ -26,48 +27,48 @@ def unionb64toPDF(fileName):
     """
 
     merger = PdfWriter()
-    #Создаем замыкание
-    def mergeb64toPDF(b64, writeFlag = False):
-        merger.append(b64toPdf(b64))
-        if writeFlag:
-            merger.write(fileName)
+    # Создаем замыкание
+
+    def merge_b64_to_pdf(b64, write_flag=False):
+        merger.append(b64_to_pdf(b64))
+        if write_flag:
+            merger.write(file_name)
             merger.close()
-        
-    return mergeb64toPDF
+
+    return merge_b64_to_pdf
 
 # функциональное программирование
 # Реализация классом
+
+
 class Unionb64toPDF():
-    def __init__(self,fileName = "file.pdf") -> None:
+    def __init__(self, file_name="file.pdf") -> None:
         self.merger = PdfWriter()
-        self.fileName = fileName
- 
-    def append(self,b64):
-        self.merger.append(b64toPdf(b64))
-            
+        self.file_name = file_name
+
+    def append(self, b64):
+        self.merger.append(b64_to_pdf(b64))
+
     def close(self):
-        self.merger.write(self.fileName)
-        self.merger.close() 
+        self.merger.write(self.file_name)
+        self.merger.close()
 
-         
 
-if __name__ == '__main__' :
-    pathfPDF = Path("test", "test.pdf")
-    pathtest64 = Path("test", "testStringb64.txt")
+if __name__ == '__main__':
+    path_fpdf = Path("test", "test.pdf")
+    path_test64 = Path("test", "testStringb64.txt")
 
-    uPDF = unionb64toPDF(pathfPDF)    
-    f= open(pathtest64)
-    uPDF(f.read(),True)
-    fPDF = PdfReader(pathfPDF)
-    page = fPDF.pages[0]
+    u_pdf = union_b64_to_pdf(path_fpdf)
+    f = open(path_test64, encoding='utf-8')
+    u_pdf(f.read(), True)
+    f_pdf = PdfReader(path_fpdf)
+    page = f_pdf.pages[0]
     print(page.extract_text())
 
-    uPDF = Unionb64toPDF(pathfPDF)    
-    f= open(pathtest64)
-    uPDF.append(f.read())
-    uPDF.close()
-    fPDF = PdfReader(pathfPDF)
-    page = fPDF.pages[0]
+    u_pdf = Unionb64toPDF(path_fpdf)
+    f = open(path_test64, encoding='utf-8')
+    u_pdf.append(f.read())
+    u_pdf.close()
+    f_pdf = PdfReader(path_fpdf)
+    page = f_pdf.pages[0]
     print(page.extract_text())
-
-
